@@ -20,14 +20,7 @@ void setupServoHaptics(){
   thumbServo.attach(PIN_THUMB_MOTOR);
 }
 
-//static scaling, maps to entire range of servo
-void scaleLimits(int* hapticLimits, float* scaledLimits){
-  for (int i = 0; i < 5; i++){
-    scaledLimits[i] = 180.0f - hapticLimits[i] / 1000.0f * 180.0f;
-  }
-}
-
-//dynamic scaling, maps to the limits calibrated from your finger
+#if SERVO_SCALING //dynamic scaling, maps to the limits calibrated from your finger
 void dynScaleLimits(int* hapticLimits, float* scaledLimits){
   //will be refactored to take min and max as an argument
 
@@ -36,10 +29,21 @@ void dynScaleLimits(int* hapticLimits, float* scaledLimits){
    * and that 0 degrees is geared to the start of the potentiometer.
    * Different hardware types may need to handle dynamic scaling differently.
    */
+   minFingers[i];
+   maxFingers[i];
+   (x - in_min) * (out_max - out_min) / (in_max - in_min) + out_min
   for (int i = 0; i < sizeof(hapticLimits); i++){
     scaledLimits[i] = hapticLimits[i] / 1000.0f * 180.0f;
   }
 }
+
+#else //static scaling, maps to entire range of servo
+void scaleLimits(int* hapticLimits, float* scaledLimits){
+  for (int i = 0; i < 5; i++){
+    scaledLimits[i] = 180.0f - hapticLimits[i] / 1000.0f * 180.0f;
+  }
+}
+#endif
 
 void writeServoHaptics(int* hapticLimits){
   float scaledLimits[5];
