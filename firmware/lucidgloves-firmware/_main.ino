@@ -1,5 +1,10 @@
 #define ALWAYS_CALIBRATING CALIBRATION_LOOPS == -1
 
+#define CALIB_OVERRIDE false
+#if USING_CALIB_PIN && COMMUNICATION == COMM_SERIAL && PIN_CALIB == 0 && !CALIB_OVERRIDE
+  #error "You can't set your calibration pin to 0 over usb. You can calibrate with the BOOT button when using bluetooth only. Set CalibOverride to true to override this."
+#endif
+
 ICommunication* comm;
 int loops = 0;
 void setup() {
@@ -66,8 +71,11 @@ void loop() {
       char received[100];
       if (comm->readData(received)){
         int hapticLimits[5];
-        decodeData(received, hapticLimits);
-        writeServoHaptics(hapticLimits);
+        //This check is a temporary hack to fix an issue with haptics on v0.5 of the driver, will make it more snobby code later
+        if(String(received).length() >= 10) {
+           decodeData(received, hapticLimits);
+           writeServoHaptics(hapticLimits); 
+        }
       }
     #endif
     delay(LOOP_TIME);
